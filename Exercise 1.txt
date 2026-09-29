@@ -1,0 +1,178 @@
+postgres=# CREATE TABLE Tastes (
+postgres(# name VARCHAR(50) NOT NULL,
+postgres(# filling VARCHAR(50) NOT NULL
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE Locations (
+postgres(# lname VARCHAR(50) PRIMARY KEY,
+postgres(# phone VARCHAR(20) NOT NULL,
+postgres(# address VARCHAR(100) NOT NULL
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE Sandwiches (
+postgres(# location VARCHAR(50) NOT NULL,
+postgres(# bread VARCHAR(50) NOT NULL,
+postgres(# filling VARCHAR(50) NOT NULL,
+postgres(# price DECIMAL(5,2) NOT NULL,
+postgres(# FOREIGN KEY (location) REFERENCES Locations(lname)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO Tastes (name, filling) VALUES
+postgres-# ('Brown', 'Turkey'),
+postgres-# ('Brown', 'Beef'),
+postgres-# ('Brown', 'Ham'),
+postgres-# ('Jones', 'Cheese'),
+postgres-# ('Green', 'Beef'),
+postgres-# ('Green', 'Turkey'),
+postgres-# ('Green', 'Cheese');
+INSERT 0 7
+postgres=# INSERT INTO Locations (lname, phone, address) VALUES
+postgres-# ('Lincoln', '683 4523', 'Lincoln Place'),
+postgres-# ('O''Neill''s', '674 2134', 'Pearse St'),
+postgres-# ('Old Nag', '767 8132', 'Dame St'),
+postgres-# ('Buttery', '702 3421', 'College St');
+INSERT 0 4
+postgres=# INSERT INTO Sandwiches (location, bread, filling, price) VALUES
+postgres-# ('Lincoln', 'Rye', 'Ham', 1.25),
+postgres-# ('O''Neill''s', 'White', 'Cheese', 1.20),
+postgres-# ('O''Neill''s', 'Whole', 'Ham', 1.25),
+postgres-# ('Old Nag', 'Rye', 'Beef', 1.35),
+postgres-# ('Buttery', 'White', 'Cheese', 1.00),
+postgres-# ('O''Neill''s', 'White', 'Turkey', 1.35),
+postgres-# ('Buttery', 'White', 'Ham', 1.10),
+postgres-# ('Lincoln', 'Rye', 'Beef', 1.35),
+postgres-# ('Lincoln', 'White', 'Ham', 1.30),
+postgres-# ('Old Nag', 'Rye', 'Ham', 1.40);
+  
+postgres=# SELECT * FROM Locations
+postgres-# WHERE lname IN (
+postgres(# SELECT location from Sandwiches
+postgres(# WHERE filling IN (
+postgres(# SELECT filling FROM Tastes
+postgres(# WHERE name = 'Jones'
+postgres(# )
+postgres(# );
+   lname   |  phone   |  address
+-----------+----------+------------
+ Buttery   | 702 3421 | College St
+ O'Neill's | 674 2134 | Pearse St
+(2 rows)
+
+postgres=# SELECT DISTINCT l.* FROM Locations l
+postgres-# JOIN Sandwiches s ON l.lname = s.location
+postgres-# JOIN Tastes t ON s.filling = t.filling
+postgres-# WHERE t.name = 'Jones';
+   lname   |  phone   |  address
+-----------+----------+------------
+ Buttery   | 702 3421 | College St
+ O'Neill's | 674 2134 | Pearse St
+(2 rows)
+  
+postgres=# SELECT s.location, COUNT(DISTINCT t.name) FROM Sandwiches s
+postgres-# JOIN Tastes t ON s.filling = t.filling
+postgres-# GROUP BY s.location;
+ location  | count
+-----------+-------
+ Buttery   |     3
+ Lincoln   |     2
+ O'Neill's |     3
+ Old Nag   |     2
+(4 rows)
+
+  
+
+
+
+
+
+
+postgres=# CREATE TABLE Branch (
+postgres(# bcode VARCHAR(10) NOT NULL PRIMARY KEY,
+postgres(# librarian VARCHAR(50) NOT NULL,
+postgres(# address VARCHAR(100) NOT NULL
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE Titles (
+postgres(# title VARCHAR(100) NOT NULL PRIMARY KEY,
+postgres(# author VARCHAR(50) NOT NULL,
+postgres(# publisher VARCHAR(50) NOT NULL
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE Holdings (
+postgres(# branch VARCHAR(10) NOT NULL,
+postgres(# title VARCHAR(100) NOT NULL,
+postgres(# copies INT NOT NULL,
+postgres(# FOREIGN KEY (branch) REFERENCES Branch(bcode),
+postgres(# FOREIGN KEY (title) REFERENCES Titles(title)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO Branch (bcode, librarian, address) VALUES
+postgres-# ('B1', 'John Smith', '2 Anglesea Rd'),
+postgres-# ('B2', 'Mary Jones', '34 Pearse St'),
+postgres-# ('B3', 'Francis Owens', 'Grange X');
+INSERT 0 3
+postgres=# INSERT INTO Titles (title, author, publisher) VALUES
+postgres-# ('Susannah', 'Ann Brown', 'Macmillan'),
+postgres-# ('How to Fish', 'Amy Fly', 'Stop Press'),
+postgres-# ('A History of Dublin', 'David Little', 'Wiley'),
+postgres-# ('Computers', 'Blaise Pascal', 'Applewoods'),
+postgres-# ('The Wife', 'Ann Brown', 'Macmillan');
+INSERT 0 5
+postgres=# INSERT INTO Holdings (branch, title, copies) VALUES
+postgres-# ('B1', 'Susannah', 3),
+postgres-# ('B1', 'How to Fish', 2),
+postgres-# ('B1', 'A History of Dublin', 1),
+postgres-# ('B2', 'How to Fish', 4),
+postgres-# ('B2', 'Computers', 2),
+postgres-# ('B2', 'The Wife', 3),
+postgres-# ('B3', 'A History of Dublin', 1),
+postgres-# ('B3', 'Computers', 4),
+postgres-# ('B3', 'Susannah', 3),
+postgres-# ('B3', 'The Wife', 1);
+INSERT 0 10
+postgres=# SELECT title FROM Titles
+postgres-# WHERE publisher = 'Macmillan';
+  title
+----------
+ Susannah
+ The Wife
+(2 rows)
+
+
+postgres=# SELECT * FROM Branch
+postgres-# WHERE bcode IN (
+postgres(# SELECT branch FROM Holdings
+postgres(# WHERE title IN (
+postgres(# SELECT title FROM Titles
+postgres(# WHERE author = 'Ann Brown'
+postgres(# )
+postgres(# );
+ bcode |   librarian   |    address
+-------+---------------+---------------
+ B1    | John Smith    | 2 Anglesea Rd
+ B2    | Mary Jones    | 34 Pearse St
+ B3    | Francis Owens | Grange X
+(3 rows)
+
+
+postgres=# SELECT DISTINCT b.* FROM Branch b
+postgres-# JOIN Holdings h ON b.bcode = h.branch
+postgres-# JOIN Titles t ON h.title = t.title
+postgres-# WHERE t.author = 'Ann Brown';
+ bcode |   librarian   |    address
+-------+---------------+---------------
+ B1    | John Smith    | 2 Anglesea Rd
+ B2    | Mary Jones    | 34 Pearse St
+ B3    | Francis Owens | Grange X
+(3 rows)
+
+
+postgres=# SELECT branch, SUM(copies) AS total_books FROM Holdings
+postgres-# GROUP BY branch;
+ branch | total_books
+--------+-------------
+ B3     |           9
+ B1     |           6
+ B2     |           9
+(3 rows)
+

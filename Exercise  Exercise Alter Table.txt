@@ -1,0 +1,16 @@
+postgres=# CREATE TABLE testing_table (
+postgres(# name VARCHAR(255),
+postgres(# contact_name VARCHAR(255),
+postgres(# roll_no VARCHAR(255)
+postgres(# );
+CREATE TABLE
+postgres=# ALTER TABLE testing_table DROP COLUMN name;
+ALTER TABLE
+postgres=# ALTER TABLE testing_table RENAME COLUMN contact_name to username;
+ALTER TABLE
+postgres=# ALTER TABLE testing_table
+postgres-# ADD COLUMN first_name VARCHAR(100),
+postgres-# ADD COLUMN last_name VARCHAR(100);
+ALTER TABLE
+postgres=# ALTER TABLE testing_table ALTER COLUMN roll_no TYPE INT USING roll_no::INT;
+ALTER TABLE
