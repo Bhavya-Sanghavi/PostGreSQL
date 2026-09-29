@@ -1,7 +1,7 @@
 postgres=# CREATE TABLE testing_table (
-postgres(# name VARCHAR(255),
-postgres(# contact_name VARCHAR(255),
-postgres(# roll_no VARCHAR(255)
+postgres(# name VARCHAR(100),
+postgres(# contact_name VARCHAR(100),
+postgres(# roll_no VARCHAR(100)
 postgres(# );
 CREATE TABLE
 postgres=# ALTER TABLE testing_table DROP COLUMN name;
