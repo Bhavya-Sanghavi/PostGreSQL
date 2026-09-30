@@ -1,0 +1,15 @@
+postgres=# CREATE DATABASE vtapp;
+CREATE DATABASE
+postgres=# CREATE USER vtapp_user WITH PASSWORD 'bhavya';
+CREATE ROLE
+postgres=# GRANT ALL PRIVILEGES ON DATABASE vtapp TO vtapp_user;
+GRANT
+postgres=# \c vtapp
+You are now connected to database "vtapp" as user "postgres".
+vtapp=# GRANT ALL PRIVILEGES ON SCHEMA public TO vtapp_user;
+GRANT
+vtapp=# GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO vtapp_user;
+GRANT
+vtapp=# ALTER DEFAULT PRIVILEGES IN SCHEMA public
+vtapp-# GRANT ALL PRIVILEGES ON TABLES TO vtapp_user;
+ALTER DEFAULT PRIVILEGES
