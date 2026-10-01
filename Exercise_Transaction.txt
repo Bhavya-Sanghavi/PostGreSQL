@@ -1,0 +1,111 @@
+postgres=# CREATE DATABASE bank;
+CREATE DATABASE
+postgres=# \c bank
+You are now connected to database "bank" as user "postgres".
+bank=# CREATE TABLE accounts(
+bank(# id SERIAL PRIMARY KEY,
+bank(# account_no BIGINT NOT NULL UNIQUE,
+bank(# balance NUMERIC(16,2) NOT NULL DEFAULT 0.00 CHECK(balance >= 0)
+bank(# );
+CREATE TABLE
+bank=# CREATE TABLE users(
+bank(# id SERIAL PRIMARY KEY,
+bank(# name VARCHAR(100) NOT NULL,
+bank(# email VARCHAR(100) NOT NULL UNIQUE,
+bank(# account_no BIGINT NOT NULL UNIQUE,
+bank(#
+bank(# FOREIGN KEY(account_no) REFERENCES accounts(account_no)
+bank(# );
+CREATE TABLE
+bank=# INSERT INTO accounts(account_no,balance) VALUES
+bank-# (777777,1000),
+bank-# (888888,2000);
+INSERT 0 2
+bank=# INSERT INTO users(name,email,account_no) VALUES
+bank-# ('userA','A@gmail.com',777777),
+bank-# ('userB','B@gmail.com',888888);
+INSERT 0 2
+bank=# BEGIN;
+BEGIN
+bank=*# UPDATE accounts a
+bank-*# SET balance = balance + 1000
+bank-*# FROM users u
+bank-*# WHERE a.account_no = u.account_no
+bank-*# AND u.name = 'userA';
+UPDATE 1
+bank=*# COMMIT;
+COMMIT
+bank=# SELECT * FROM accounts;
+ id | account_no | balance
+----+------------+---------
+  2 |     888888 | 2000.00
+  1 |     777777 | 2000.00
+(2 rows)
+
+
+bank=# BEGIN;
+BEGIN
+bank=*# SELECT a.balance
+bank-*# FROM accounts a
+bank-*# JOIN users u
+bank-*# ON a.account_no = u.account_no
+bank-*# WHERE u.name = 'userA'
+bank-*# FOR UPDATE OF a;
+ balance
+---------
+ 2000.00
+(1 row)
+
+
+bank=*# UPDATE accounts a
+bank-*# SET balance = balance - 500
+bank-*# FROM users u
+bank-*# WHERE a.account_no = u.account_no
+bank-*# AND u.name = 'userA'
+bank-*# AND balance >= 500;
+UPDATE 1
+bank=*# COMMIT;
+COMMIT
+bank=# SELECT * FROM accounts;
+ id | account_no | balance
+----+------------+---------
+  2 |     888888 | 2000.00
+  1 |     777777 | 1500.00
+(2 rows)
+
+
+bank=# BEGIN;
+BEGIN
+bank=*# SELECT a.balance
+bank-*# FROM accounts a
+bank-*# JOIN users u ON a.account_no = u.account_no
+bank-*# WHERE u.name IN ('userA','userB')
+bank-*# FOR UPDATE OF a;
+ balance
+---------
+ 1500.00
+ 2000.00
+(2 rows)
+
+
+bank=*# UPDATE accounts a
+bank-*# SET balance = balance - 200
+bank-*# FROM users u
+bank-*# WHERE a.account_no = u.account_no
+bank-*# AND u.name = 'userA'
+bank-*# AND a.balance >= 200;
+UPDATE 1
+bank=*# UPDATE accounts a
+bank-*# SET balance = balance + 200
+bank-*# FROM users u
+bank-*# WHERE a.account_no = u.account_no
+bank-*# AND u.name = 'userB';
+UPDATE 1
+bank=*# COMMIT;
+COMMIT
+bank=# SELECT * FROM accounts;
+ id | account_no | balance
+----+------------+---------
+  1 |     777777 | 1300.00
+  2 |     888888 | 2200.00
+(2 rows)
