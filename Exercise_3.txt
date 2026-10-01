@@ -1,0 +1,201 @@
+postgres=# CREATE TABLE users (
+postgres(# id SERIAL PRIMARY KEY,
+postgres(# name VARCHAR(100) NOT NULL,
+postgres(# email VARCHAR(100) NOT NULL UNIQUE,
+postgres(# password VARCHAR(100) NOT NULL,
+postgres(# user_type VARCHAR(10) NOT NULL CHECK(user_type IN('normal', 'admin'))
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE categories (
+postgres(# id SERIAL PRIMARY KEY,
+postgres(# name VARCHAR(100) NOT NULL UNIQUE
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE articles(
+postgres(# id SERIAL PRIMARY KEY,
+postgres(# title VARCHAR(100) NOT NULL UNIQUE,
+postgres(# content TEXT NOT NULL,
+postgres(# author_id INT NOT NULL,
+postgres(# category_id INT NOT NULL,
+postgres(#
+postgres(# FOREIGN KEY(author_id) REFERENCES users(id),
+postgres(# FOREIGN KEY(category_id) REFERENCES categories(id)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE comments (
+postgres(# id SERIAL PRIMARY KEY,
+postgres(# content TEXT NOT NULL,
+postgres(# user_id INT NOT NULL,
+postgres(# article_id INT NOT NULL,
+postgres(#
+postgres(# FOREIGN KEY(user_id) REFERENCES users(id),
+postgres(# FOREIGN KEY(article_id) REFERENCES articles(id)
+postgres(# );
+CREATE TABLE
+postgres=#
+postgres=# INSERT INTO users (name, email, password, user_type)
+postgres-# VALUES
+postgres-# ('user1', 'user1@gmail.com', 'password123', 'admin'),
+postgres-# ('user2', 'user2@gmail.com', 'password123', 'normal'),
+postgres-# ('user3', 'user3@gmail.com', 'password123', 'normal'),
+postgres-# ('user4', 'user4@gmail.com', 'password123', 'normal'),
+postgres-# ('user5', 'user5@gmail.com', 'password123', 'normal');
+INSERT 0 5
+postgres=#  SELECT * FROM users;
+ id | name  |      email      |  password   | user_type
+----+-------+-----------------+-------------+-----------
+  1 | user1 | user1@gmail.com | password123 | admin
+  2 | user2 | user2@gmail.com | password123 | normal
+  3 | user3 | user3@gmail.com | password123 | normal
+  4 | user4 | user4@gmail.com | password123 | normal
+  5 | user5 | user5@gmail.com | password123 | normal
+(5 rows)
+
+
+postgres=# INSERT INTO categories (name)
+postgres-# VALUES
+postgres-# ('Technology'),
+postgres-# ('Programming'),
+postgres-# ('Database'),
+postgres-# ('Web Development');
+INSERT 0 4
+postgres=#
+postgres=# INSERT INTO articles (title, content, author_id, category_id)
+postgres-# VALUES
+postgres-# ('A', 'AAAAAA', 1, 3),
+postgres-# ('B', 'BBBBBB', 2, 2),
+postgres-# ('C', 'CCCCCC', 3, 4),
+postgres-# ('D', 'DDDDDD', 3, 3),
+postgres-# ('E', 'EEEEEE', 1, 2),
+postgres-# ('F', 'FFFFFF', 2, 1);
+INSERT 0 6
+postgres=#
+postgres=# INSERT INTO comments (content, user_id, article_id)
+postgres-# VALUES
+postgres-# ('Ac1', 2, 1),
+postgres-# ('Ac2', 2, 1),
+postgres-# ('Bc', 3, 1),
+postgres-# ('Cc', 4, 1),
+postgres-# ('Dc', 5, 1),
+postgres-# ('Ec', 3, 2),
+postgres-# ('Fc', 4, 2),
+postgres-# ('Gc', 2, 3),
+postgres-# ('Hc', 5, 3),
+postgres-# ('Ic', 2, 4),
+postgres-# ('Jc', 3, 4),
+postgres-# ('Kc', 5, 4);
+INSERT 0 12
+postgres=#
+postgres=# SELECT a.title, a.content
+postgres-# FROM articles a
+postgres-# JOIN users u
+postgres-# ON a.author_id = u.id
+postgres-# WHERE u.name = 'user3';
+ title | content
+-------+---------
+ C     | CCCCCC
+ D     | DDDDDD
+(2 rows)
+
+
+postgres=# \set username 'user3'
+postgres=#
+postgres=# SELECT a.title, a.content
+postgres-# FROM articles a
+postgres-# JOIN users u
+postgres-# ON a.author_id = u.id
+postgres-# WHERE u.name = :'username';
+ title | content
+-------+---------
+ C     | CCCCCC
+ D     | DDDDDD
+(2 rows)
+
+
+postgres=# SELECT a.title, a.content, c.content as comment
+postgres-# FROM articles a
+postgres-# JOIN users u
+postgres-# ON a.author_id = u.id
+postgres-# LEFT JOIN comments c
+postgres-# ON a.id = c.article_id
+postgres-# WHERE u.name = 'user3';
+ title | content | comment
+-------+---------+---------
+ C     | CCCCCC  | Gc
+ C     | CCCCCC  | Hc
+ D     | DDDDDD  | Ic
+ D     | DDDDDD  | Jc
+ D     | DDDDDD  | Kc
+(5 rows)
+
+
+postgres=# SELECT a.title, a.content, c.content as comment
+postgres-# FROM articles a
+postgres-# LEFT JOIN comments c
+postgres-# ON a.id = c.article_id
+postgres-# WHERE a.author_id IN (
+postgres(# SELECT id
+postgres(# FROM users
+postgres(# WHERE name = 'user3'
+postgres(# );
+ title | content | comment
+-------+---------+---------
+ C     | CCCCCC  | Gc
+ C     | CCCCCC  | Hc
+ D     | DDDDDD  | Ic
+ D     | DDDDDD  | Jc
+ D     | DDDDDD  | Kc
+(5 rows)
+
+
+postgres=# SELECT a.title, a.content
+postgres-# FROM articles a
+postgres-# LEFT JOIN comments c
+postgres-# ON a.id = c.article_id
+postgres-# WHERE c.article_id IS NULL;
+ title | content
+-------+---------
+ E     | EEEEEE
+ F     | FFFFFF
+(2 rows)
+
+
+postgres=# SELECT a.title, a.content
+postgres-# FROM articles a
+postgres-# WHERE id NOT IN(
+postgres(# SELECT article_id
+postgres(# FROM comments
+postgres(# );
+ title | content
+-------+---------
+ E     | EEEEEE
+ F     | FFFFFF
+(2 rows)
+
+
+postgres=# SELECT a.title, a.content, COUNT(c.id) as num_of_comments
+postgres-# FROM articles a
+postgres-# JOIN comments c
+postgres-# ON a.id = c.article_id
+postgres-# GROUP BY a.id
+postgres-# ORDER BY num_of_comments DESC
+postgres-# LIMIT 1;
+ title | content | num_of_comments
+-------+---------+-----------------
+ A     | AAAAAA  |               5
+(1 row)
+
+
+postgres=# SELECT a.title, a.content
+postgres-# FROM articles a
+postgres-# LEFT JOIN comments c ON a.id = c.article_id
+postgres-# GROUP BY a.id
+postgres-# HAVING COUNT(c.id) = COUNT(DISTINCT c.user_id);
+ title | content
+-------+---------
+ B     | BBBBBB
+ C     | CCCCCC
+ D     | DDDDDD
+ E     | EEEEEE
+ F     | FFFFFF
+(5 rows)
