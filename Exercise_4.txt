@@ -1,0 +1,19 @@
+C:\Program Files\PostgreSQL\18\bin>pg_dump -U postgres -d mydb -F c -f "C:\Users\bhavy\OneDrive\Desktop\backup\mydb.dump"
+
+postgres=# CREATE DATABASE restored;
+CREATE DATABASE
+
+C:\Program Files\PostgreSQL\18\bin>pg_restore -U postgres -d restored "C:\Users\bhavy\OneDrive\Desktop\backup\mydb.dump"
+
+postgres=# \c restored
+You are now connected to database "restored" as user "postgres".
+restored=# \dt
+             List of tables
+ Schema |    Name    | Type  |  Owner
+--------+------------+-------+----------
+ public | articles   | table | postgres
+ public | categories | table | postgres
+ public | comments   | table | postgres
+ public | users      | table | postgres
+(4 rows)
+
