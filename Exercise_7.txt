@@ -1,0 +1,55 @@
+Q1
+
+It gives a plan tree of the execution plan for the query.
+
+
+cost=a..b: a = startup cost, b = total cost
+rows: estimated rows returned by that node
+width: avg row size in bytes
+type of scan: Seq Scan, Index Scan, Index Only Scan
+Filter condition: the condition applied
+
+Q2.1
+
+MySQL: type=ALL means full table scan, it reads every row in the table to find user_id = 41
+
+PostgreSQL: same thing, shows "Seq Scan on comments" with a filter condition
+
+Q2.2
+
+No, we should add an index on user_id
+
+Q3.1
+
+We can write in any order for this query because all are equality conditions but for other common queries it would be efficient to make composite index on (commentable_type, commentable_id, user_id), in this order.
+
+Q4.1 
+
+EXPLAIN SELECT *
+FROM employees e
+JOIN departments d 
+ON e.department_id = d.id;
+
+"Hash Join  (cost=1.14..15.60 rows=6 width=464)"					uses a hash based algorithm to join the two tables
+"  Hash Cond: (d.id = e.department_id)"               					condition used for joining
+"  ->  Seq Scan on departments d  (cost=0.00..13.20 rows=320 width=222)"        	reads the table sequentially
+"  ->  Hash  (cost=1.06..1.06 rows=6 width=242)"                			estimated startup cost and total cost
+"        ->  Seq Scan on employees e  (cost=0.00..1.06 rows=6 width=242)"		estimated number of rows and average size of each output row in bytes
+
+
+
+Q4.2
+
+EXPLAIN SELECT e.*, d.*
+FROM employees e,
+(SELECT * FROM departments) d
+WHERE e.department_id = d.id;
+
+"Hash Join  (cost=1.14..15.60 rows=6 width=464)"
+"  Hash Cond: (departments.id = e.department_id)"
+"  ->  Seq Scan on departments  (cost=0.00..13.20 rows=320 width=222)"
+"  ->  Hash  (cost=1.06..1.06 rows=6 width=242)"
+"        ->  Seq Scan on employees e  (cost=0.00..1.06 rows=6 width=242)"
+
+
+No, query is better than the other because the estimated cost is the same.
