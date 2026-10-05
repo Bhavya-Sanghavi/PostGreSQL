@@ -27,22 +27,22 @@ postgres-# ('Green', 'Turkey'),
 postgres-# ('Green', 'Cheese');
 INSERT 0 7
 postgres=# INSERT INTO Locations (lname, phone, address) VALUES
-postgres-# ('Lincoln', '683 4523', 'Lincoln Place'),
-postgres-# ('O''Neill''s', '674 2134', 'Pearse St'),
-postgres-# ('Old Nag', '767 8132', 'Dame St'),
-postgres-# ('Buttery', '702 3421', 'College St');
+postgres-# ('Lincoln', '111111', 'Lincoln Place'),
+postgres-# ('O''Neill''s', '222222', 'Pearse St'),
+postgres-# ('Old Nag', '333333', 'Dame St'),
+postgres-# ('Buttery', '444444', 'College St');
 INSERT 0 4
 postgres=# INSERT INTO Sandwiches (location, bread, filling, price) VALUES
-postgres-# ('Lincoln', 'Rye', 'Ham', 1.25),
-postgres-# ('O''Neill''s', 'White', 'Cheese', 1.20),
-postgres-# ('O''Neill''s', 'Whole', 'Ham', 1.25),
-postgres-# ('Old Nag', 'Rye', 'Beef', 1.35),
-postgres-# ('Buttery', 'White', 'Cheese', 1.00),
-postgres-# ('O''Neill''s', 'White', 'Turkey', 1.35),
-postgres-# ('Buttery', 'White', 'Ham', 1.10),
-postgres-# ('Lincoln', 'Rye', 'Beef', 1.35),
-postgres-# ('Lincoln', 'White', 'Ham', 1.30),
-postgres-# ('Old Nag', 'Rye', 'Ham', 1.40);
+postgres-# ('Lincoln', 'Rye', 'Ham', 1.1),
+postgres-# ('O''Neill''s', 'White', 'Cheese', 1.2),
+postgres-# ('O''Neill''s', 'Whole', 'Ham', 1.3),
+postgres-# ('Old Nag', 'Rye', 'Beef', 1.4),
+postgres-# ('Buttery', 'White', 'Cheese', 1.5),
+postgres-# ('O''Neill''s', 'White', 'Turkey', 1.6),
+postgres-# ('Buttery', 'White', 'Ham', 1.7),
+postgres-# ('Lincoln', 'Rye', 'Beef', 1.8),
+postgres-# ('Lincoln', 'White', 'Ham', 1.9),
+postgres-# ('Old Nag', 'Rye', 'Ham', 2.0);
 INSERT 0 10
 postgres=# SELECT *
 postgres-# FROM Locations
@@ -53,10 +53,10 @@ postgres(# SELECT filling FROM Tastes
 postgres(# WHERE name = 'Jones'
 postgres(# )
 postgres(# );
-   lname   |  phone   |  address
+   lname   | phone  |  address
 -----------+----------+------------
- Buttery   | 702 3421 | College St
- O'Neill's | 674 2134 | Pearse St
+ Buttery   | 444444 | College St
+ O'Neill's | 222222 | Pearse St
 (2 rows)
 
 postgres=# SELECT DISTINCT l.*
@@ -64,10 +64,10 @@ postgres-# FROM Locations l
 postgres-# JOIN Sandwiches s ON l.lname = s.location
 postgres-# JOIN Tastes t ON s.filling = t.filling
 postgres-# WHERE t.name = 'Jones';
-   lname   |  phone   |  address
+   lname   | phone  |  address
 -----------+----------+------------
- Buttery   | 702 3421 | College St
- O'Neill's | 674 2134 | Pearse St
+ Buttery   | 444444 | College St
+ O'Neill's | 222222 | Pearse St
 (2 rows)
   
 postgres=# SELECT s.location, COUNT(DISTINCT t.name)
