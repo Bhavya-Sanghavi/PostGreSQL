@@ -100,7 +100,7 @@ CREATE TABLE
 postgres=# CREATE TABLE Holdings (
 postgres(# branch VARCHAR(10) NOT NULL,
 postgres(# title VARCHAR(100) NOT NULL,
-postgres(# copies INT NOT NULL,
+postgres(# copies INT NOT NULL DEFAULT 0,
 postgres(# FOREIGN KEY (branch) REFERENCES Branch(bcode),
 postgres(# FOREIGN KEY (title) REFERENCES Titles(title)
 postgres(# );
