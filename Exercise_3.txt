@@ -1,3 +1,14 @@
+Design a table structure for following conditions:
+
+A user can write many articles. Each written article will fall under one category. Remember that many articles can be written under same category.
+
+The users can be of two types viz. admin or normal. A user can post multiple comments on an article.
+
+Now write queries for:
+
+manage(create, update, delete) categories, articles, comments, and users
+
+
 postgres=# CREATE TABLE users (
 postgres(# id SERIAL PRIMARY KEY,
 postgres(# name VARCHAR(100) NOT NULL,
@@ -85,6 +96,9 @@ postgres-# ('Ic', 2, 4),
 postgres-# ('Jc', 3, 4),
 postgres-# ('Kc', 5, 4);
 INSERT 0 12
+
+-- select all articles whose author's name is user3 (Do this exercise using variable also).
+
 postgres=#
 postgres=# SELECT a.title, a.content
 postgres-# FROM articles a
@@ -111,6 +125,7 @@ postgres-# WHERE u.name = :'username';
  D     | DDDDDD
 (2 rows)
 
+For all the articles being selected above, select all the articles and also the comments associated with those articles in a single query (Do this using subquery also)
 
 postgres=# SELECT a.title, a.content, c.content as comment
 postgres-# FROM articles a
@@ -147,6 +162,7 @@ postgres(# );
  D     | DDDDDD  | Kc
 (5 rows)
 
+-- Write a query to select all articles which do not have any comments (Do using subquery also)
 
 postgres=# SELECT a.title, a.content
 postgres-# FROM articles a
@@ -172,6 +188,7 @@ postgres(# );
  F     | FFFFFF
 (2 rows)
 
+-- Write a query to select article which has maximum comments
 
 postgres=# SELECT a.title, a.content, COUNT(c.id) as num_of_comments
 postgres-# FROM articles a
@@ -185,6 +202,7 @@ postgres-# LIMIT 1;
  A     | AAAAAA  |               5
 (1 row)
 
+-- Write a query to select article which does not have more than one comment by the same user ( do this using left join and group by )
 
 postgres=# SELECT a.title, a.content
 postgres-# FROM articles a
