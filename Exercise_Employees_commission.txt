@@ -1,3 +1,11 @@
+Design a database for storing employee data according to their departments.
+
+An employee must belong to a department and a department can have many employees.
+
+An employee can receive multiple commissions.
+
+After creating the required, write queries for the following:
+
 postgres=# CREATE DATABASE employee_db;
 CREATE DATABASE
 postgres=# \c employee_db
@@ -51,6 +59,9 @@ employee_db-# (6,4,2000),
 employee_db-# (7,5,1000),
 employee_db-# (8,6,5000);
 INSERT 0 8
+
+-- i. Find the employee who gets the highest total commission. 
+
 employee_db=# SELECT e.id, e.name, SUM(c.commission_amount) as total_commission
 employee_db-# FROM employees e
 employee_db-# JOIN commissions c
@@ -63,6 +74,7 @@ employee_db-# LIMIT 1;
   1 | Chris Gayle |          9000.00
 (1 row)
 
+-- ii. Find employee with 4th Highest salary from employee table.
 
 employee_db=# SELECT id,name,salary
 employee_db-# FROM(
@@ -75,6 +87,7 @@ employee_db-# WHERE rank = 4;
   3 | Rahul Dravid | 700000.00
 (1 row)
 
+iii. Find department that is giving highest commission.
 
 employee_db=# SELECT d.id, d.name, SUM(c.commission_amount) as total_commission
 employee_db-# FROM departments d
@@ -90,6 +103,9 @@ employee_db-# LIMIT 1;
   1 | Banking |         13000.00
 (1 row)
 
+-- iv. Find employees getting commission more than 3000
+--    Display Output in following pattern:  
+--      Chris Gayle, Rahul Dravid  4000
 
 employee_db=# SELECT STRING_AGG(e.name,', ' ORDER BY e.name) AS employees, c.commission_amount
 employee_db-# FROM employees e
