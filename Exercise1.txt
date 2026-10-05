@@ -43,7 +43,7 @@ postgres-# ('Buttery', 'White', 'Ham', 1.10),
 postgres-# ('Lincoln', 'Rye', 'Beef', 1.35),
 postgres-# ('Lincoln', 'White', 'Ham', 1.30),
 postgres-# ('Old Nag', 'Rye', 'Ham', 1.40);
-  
+INSERT 0 10
 postgres=# SELECT * FROM Locations
 postgres-# WHERE lname IN (
 postgres(# SELECT location from Sandwiches
