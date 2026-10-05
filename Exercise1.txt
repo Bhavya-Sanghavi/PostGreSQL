@@ -44,7 +44,8 @@ postgres-# ('Lincoln', 'Rye', 'Beef', 1.35),
 postgres-# ('Lincoln', 'White', 'Ham', 1.30),
 postgres-# ('Old Nag', 'Rye', 'Ham', 1.40);
 INSERT 0 10
-postgres=# SELECT * FROM Locations
+postgres=# SELECT *
+postgres-# FROM Locations
 postgres-# WHERE lname IN (
 postgres(# SELECT location from Sandwiches
 postgres(# WHERE filling IN (
@@ -58,7 +59,8 @@ postgres(# );
  O'Neill's | 674 2134 | Pearse St
 (2 rows)
 
-postgres=# SELECT DISTINCT l.* FROM Locations l
+postgres=# SELECT DISTINCT l.*
+postgres-# FROM Locations l
 postgres-# JOIN Sandwiches s ON l.lname = s.location
 postgres-# JOIN Tastes t ON s.filling = t.filling
 postgres-# WHERE t.name = 'Jones';
@@ -68,7 +70,8 @@ postgres-# WHERE t.name = 'Jones';
  O'Neill's | 674 2134 | Pearse St
 (2 rows)
   
-postgres=# SELECT s.location, COUNT(DISTINCT t.name) FROM Sandwiches s
+postgres=# SELECT s.location, COUNT(DISTINCT t.name)
+postgres-# FROM Sandwiches s
 postgres-# JOIN Tastes t ON s.filling = t.filling
 postgres-# GROUP BY s.location;
  location  | count
@@ -78,10 +81,6 @@ postgres-# GROUP BY s.location;
  O'Neill's |     3
  Old Nag   |     2
 (4 rows)
-
-  
-
-
 
 
 
@@ -130,7 +129,8 @@ postgres-# ('B3', 'Computers', 4),
 postgres-# ('B3', 'Susannah', 3),
 postgres-# ('B3', 'The Wife', 1);
 INSERT 0 10
-postgres=# SELECT title FROM Titles
+postgres=# SELECT title
+postgres-# FROM Titles
 postgres-# WHERE publisher = 'Macmillan';
   title
 ----------
@@ -139,7 +139,8 @@ postgres-# WHERE publisher = 'Macmillan';
 (2 rows)
 
 
-postgres=# SELECT * FROM Branch
+postgres=# SELECT *
+postgres-# FROM Branch
 postgres-# WHERE bcode IN (
 postgres(# SELECT branch FROM Holdings
 postgres(# WHERE title IN (
@@ -155,7 +156,8 @@ postgres(# );
 (3 rows)
 
 
-postgres=# SELECT DISTINCT b.* FROM Branch b
+postgres=# SELECT DISTINCT b.*
+postgres-# FROM Branch b
 postgres-# JOIN Holdings h ON b.bcode = h.branch
 postgres-# JOIN Titles t ON h.title = t.title
 postgres-# WHERE t.author = 'Ann Brown';
@@ -167,7 +169,8 @@ postgres-# WHERE t.author = 'Ann Brown';
 (3 rows)
 
 
-postgres=# SELECT branch, SUM(copies) AS total_books FROM Holdings
+postgres=# SELECT branch, SUM(copies) AS total_books
+postgres-# FROM Holdings
 postgres-# GROUP BY branch;
  branch | total_books
 --------+-------------
