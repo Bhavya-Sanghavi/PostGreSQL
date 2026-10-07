@@ -179,7 +179,7 @@ postgres-# WHERE c.article_id IS NULL;
 postgres=# SELECT a.title, a.content
 postgres-# FROM articles a
 postgres-# WHERE id NOT IN(
-postgres(# SELECT article_id
+postgres(# SELECT DISTINCT article_id
 postgres(# FROM comments
 postgres(# );
  title | content
