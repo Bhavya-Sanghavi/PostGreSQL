@@ -20,7 +20,7 @@ You are now connected to database "bank" as user "postgres".
 bank=# CREATE TABLE accounts(
 bank(# id SERIAL PRIMARY KEY,
 bank(# account_no BIGINT NOT NULL UNIQUE,
-bank(# balance NUMERIC(16,2) NOT NULL DEFAULT 0.00 CHECK(balance >= 0)
+bank(# balance NUMERIC(12,2) NOT NULL DEFAULT 0.00
 bank(# );
 CREATE TABLE
 bank=# CREATE TABLE users(
@@ -49,7 +49,7 @@ bank=*# UPDATE accounts a
 bank-*# SET balance = balance + 1000
 bank-*# FROM users u
 bank-*# WHERE a.account_no = u.account_no
-bank-*# AND u.name = 'userA';
+bank-*# AND u.account_no = 777777;
 UPDATE 1
 bank=*# COMMIT;
 COMMIT
@@ -68,7 +68,7 @@ bank=*# SELECT a.balance
 bank-*# FROM accounts a
 bank-*# JOIN users u
 bank-*# ON a.account_no = u.account_no
-bank-*# WHERE u.name = 'userA'
+bank-*# WHERE u.account_no = 777777
 bank-*# FOR UPDATE OF a;
  balance
 ---------
@@ -80,7 +80,7 @@ bank=*# UPDATE accounts a
 bank-*# SET balance = balance - 500
 bank-*# FROM users u
 bank-*# WHERE a.account_no = u.account_no
-bank-*# AND u.name = 'userA'
+bank-*# AND u.account_no = 777777
 bank-*# AND balance >= 500;
 UPDATE 1
 bank=*# COMMIT;
@@ -100,7 +100,7 @@ BEGIN
 bank=*# SELECT a.balance
 bank-*# FROM accounts a
 bank-*# JOIN users u ON a.account_no = u.account_no
-bank-*# WHERE u.name IN ('userA','userB')
+bank-*# WHERE u.account_no IN (777777, 888888)
 bank-*# FOR UPDATE OF a;
  balance
 ---------
@@ -113,14 +113,14 @@ bank=*# UPDATE accounts a
 bank-*# SET balance = balance - 200
 bank-*# FROM users u
 bank-*# WHERE a.account_no = u.account_no
-bank-*# AND u.name = 'userA'
+bank-*# AND u.account_no = 777777
 bank-*# AND a.balance >= 200;
 UPDATE 1
 bank=*# UPDATE accounts a
 bank-*# SET balance = balance + 200
 bank-*# FROM users u
 bank-*# WHERE a.account_no = u.account_no
-bank-*# AND u.name = 'userB';
+bank-*# AND u.account_no = 888888
 UPDATE 1
 bank=*# COMMIT;
 COMMIT
