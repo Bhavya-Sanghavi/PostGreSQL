@@ -77,11 +77,10 @@ employee_db-# LIMIT 1;
 -- ii. Find employee with 4th Highest salary from employee table.
 
 employee_db=# SELECT id,name,salary
-employee_db-# FROM(
-employee_db(# SELECT id,name,salary,DENSE_RANK() OVER(ORDER BY salary DESC) AS rank
-employee_db(# FROM employees
-employee_db(# )
-employee_db-# WHERE rank = 4;
+employee_db-# FROM employees
+employee_db(# ORDER BY salary
+employee_db(# OFFSET 3
+employee_db(# LIMIT 1;
  id |     name     |  salary
 ----+--------------+-----------
   3 | Rahul Dravid | 700000.00
