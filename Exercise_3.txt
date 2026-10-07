@@ -8,13 +8,13 @@ Now write queries for:
 
 manage(create, update, delete) categories, articles, comments, and users
 
-
+postgres=# CREATE TYPE user_type_enum AS ENUM ('normal','admin');
+CREATE TYPE
 postgres=# CREATE TABLE users (
 postgres(# id SERIAL PRIMARY KEY,
 postgres(# name VARCHAR(100) NOT NULL,
 postgres(# email VARCHAR(100) NOT NULL UNIQUE,
-postgres(# password VARCHAR(100) NOT NULL,
-postgres(# user_type VARCHAR(10) NOT NULL CHECK(user_type IN('normal', 'admin'))
+postgres(# user_type user_type_enum NOT NULL
 postgres(# );
 CREATE TABLE
 postgres=# CREATE TABLE categories (
@@ -44,25 +44,14 @@ postgres(# FOREIGN KEY(article_id) REFERENCES articles(id)
 postgres(# );
 CREATE TABLE
 postgres=#
-postgres=# INSERT INTO users (name, email, password, user_type)
+postgres=# INSERT INTO users (name, email, user_type)
 postgres-# VALUES
-postgres-# ('user1', 'user1@gmail.com', 'password123', 'admin'),
-postgres-# ('user2', 'user2@gmail.com', 'password123', 'normal'),
-postgres-# ('user3', 'user3@gmail.com', 'password123', 'normal'),
-postgres-# ('user4', 'user4@gmail.com', 'password123', 'normal'),
-postgres-# ('user5', 'user5@gmail.com', 'password123', 'normal');
+postgres-# ('user1', 'user1@gmail.com', 'admin'),
+postgres-# ('user2', 'user2@gmail.com', 'normal'),
+postgres-# ('user3', 'user3@gmail.com', 'normal'),
+postgres-# ('user4', 'user4@gmail.com', 'normal'),
+postgres-# ('user5', 'user5@gmail.com', 'normal');
 INSERT 0 5
-postgres=#  SELECT * FROM users;
- id | name  |      email      |  password   | user_type
-----+-------+-----------------+-------------+-----------
-  1 | user1 | user1@gmail.com | password123 | admin
-  2 | user2 | user2@gmail.com | password123 | normal
-  3 | user3 | user3@gmail.com | password123 | normal
-  4 | user4 | user4@gmail.com | password123 | normal
-  5 | user5 | user5@gmail.com | password123 | normal
-(5 rows)
-
-
 postgres=# INSERT INTO categories (name)
 postgres-# VALUES
 postgres-# ('Technology'),
@@ -73,42 +62,40 @@ INSERT 0 4
 postgres=#
 postgres=# INSERT INTO articles (title, content, author_id, category_id)
 postgres-# VALUES
-postgres-# ('A', 'AAAAAA', 1, 3),
-postgres-# ('B', 'BBBBBB', 2, 2),
-postgres-# ('C', 'CCCCCC', 3, 4),
-postgres-# ('D', 'DDDDDD', 3, 3),
-postgres-# ('E', 'EEEEEE', 1, 2),
-postgres-# ('F', 'FFFFFF', 2, 1);
+postgres-# ('Beautiful Morning','Today feels really good',1,1),
+postgres-# ('Evening Walk','The weather feels pleasant',2,4),
+postgres-# ('Weekend Trip','We had lots fun',3,2),
+postgres-# ('Rainy Evening','Rain makes everything peaceful',3,1),
+postgres-# ('Morning Breakfast','Breakfast tastes really delicious',1,3),
+postgres-# ('Happy Day','Today was simply wonderful',2,4);
 INSERT 0 6
-postgres=#
 postgres=# INSERT INTO comments (content, user_id, article_id)
 postgres-# VALUES
-postgres-# ('Ac1', 2, 1),
-postgres-# ('Ac2', 2, 1),
-postgres-# ('Bc', 3, 1),
-postgres-# ('Cc', 4, 1),
-postgres-# ('Dc', 5, 1),
-postgres-# ('Ec', 3, 2),
-postgres-# ('Fc', 4, 2),
-postgres-# ('Gc', 2, 3),
-postgres-# ('Hc', 5, 3),
-postgres-# ('Ic', 2, 4),
-postgres-# ('Jc', 3, 4),
-postgres-# ('Kc', 5, 4);
+postgres-# ('Correct',2,1),
+postgres-# ('Yes',2,1),
+postgres-# ('Great',3,1),
+postgres-# ('Good',4,1),
+postgres-# ('Niceee',5,1),
+postgres-# ('Wow',3,2),
+postgres-# ('Mind-blowing',4,2),
+postgres-# ('Mesmerised',2,3),
+postgres-# ('Funny',5,3),
+postgres-# ('Hurray',2,4),
+postgres-# ('Relaxing',3,4),
+postgres-# ('Excellent',5,4);
 INSERT 0 12
 
 -- select all articles whose author's name is user3 (Do this exercise using variable also).
 
-postgres=#
 postgres=# SELECT a.title, a.content
 postgres-# FROM articles a
 postgres-# JOIN users u
 postgres-# ON a.author_id = u.id
 postgres-# WHERE u.name = 'user3';
- title | content
--------+---------
- C     | CCCCCC
- D     | DDDDDD
+     title     |            content
+---------------+--------------------------------
+ Weekend Trip  | We had lots fun
+ Rainy Evening | Rain makes everything peaceful
 (2 rows)
 
 
@@ -119,13 +106,13 @@ postgres-# FROM articles a
 postgres-# JOIN users u
 postgres-# ON a.author_id = u.id
 postgres-# WHERE u.name = :'username';
- title | content
--------+---------
- C     | CCCCCC
- D     | DDDDDD
+     title     |            content
+---------------+--------------------------------
+ Weekend Trip  | We had lots fun
+ Rainy Evening | Rain makes everything peaceful
 (2 rows)
 
-For all the articles being selected above, select all the articles and also the comments associated with those articles in a single query (Do this using subquery also)
+-- For all the articles being selected above, select all the articles and also the comments associated with those articles in a single query (Do this using subquery also)
 
 postgres=# SELECT a.title, a.content, c.content as comment
 postgres-# FROM articles a
@@ -134,13 +121,13 @@ postgres-# ON a.author_id = u.id
 postgres-# LEFT JOIN comments c
 postgres-# ON a.id = c.article_id
 postgres-# WHERE u.name = 'user3';
- title | content | comment
--------+---------+---------
- C     | CCCCCC  | Gc
- C     | CCCCCC  | Hc
- D     | DDDDDD  | Ic
- D     | DDDDDD  | Jc
- D     | DDDDDD  | Kc
+     title     |            content             |  comment
+---------------+--------------------------------+------------
+ Weekend Trip  | We had lots fun                | Mesmerised
+ Weekend Trip  | We had lots fun                | Funny
+ Rainy Evening | Rain makes everything peaceful | Hurray
+ Rainy Evening | Rain makes everything peaceful | Relaxing
+ Rainy Evening | Rain makes everything peaceful | Excellent
 (5 rows)
 
 
@@ -153,13 +140,13 @@ postgres(# SELECT id
 postgres(# FROM users
 postgres(# WHERE name = 'user3'
 postgres(# );
- title | content | comment
--------+---------+---------
- C     | CCCCCC  | Gc
- C     | CCCCCC  | Hc
- D     | DDDDDD  | Ic
- D     | DDDDDD  | Jc
- D     | DDDDDD  | Kc
+     title     |            content             |  comment
+---------------+--------------------------------+------------
+ Weekend Trip  | We had lots fun                | Mesmerised
+ Weekend Trip  | We had lots fun                | Funny
+ Rainy Evening | Rain makes everything peaceful | Hurray
+ Rainy Evening | Rain makes everything peaceful | Relaxing
+ Rainy Evening | Rain makes everything peaceful | Excellent
 (5 rows)
 
 -- Write a query to select all articles which do not have any comments (Do using subquery also)
@@ -169,10 +156,10 @@ postgres-# FROM articles a
 postgres-# LEFT JOIN comments c
 postgres-# ON a.id = c.article_id
 postgres-# WHERE c.article_id IS NULL;
- title | content
--------+---------
- E     | EEEEEE
- F     | FFFFFF
+       title       |              content
+-------------------+-----------------------------------
+ Morning Breakfast | Breakfast tastes really delicious
+ Happy Day         | Today was simply wonderful
 (2 rows)
 
 
@@ -182,10 +169,10 @@ postgres-# WHERE id NOT IN(
 postgres(# SELECT DISTINCT article_id
 postgres(# FROM comments
 postgres(# );
- title | content
--------+---------
- E     | EEEEEE
- F     | FFFFFF
+       title       |              content
+-------------------+-----------------------------------
+ Morning Breakfast | Breakfast tastes really delicious
+ Happy Day         | Today was simply wonderful
 (2 rows)
 
 -- Write a query to select article which has maximum comments
@@ -197,9 +184,9 @@ postgres-# ON a.id = c.article_id
 postgres-# GROUP BY a.id
 postgres-# ORDER BY num_of_comments DESC
 postgres-# LIMIT 1;
- title | content | num_of_comments
--------+---------+-----------------
- A     | AAAAAA  |               5
+       title       |         content         | num_of_comments
+-------------------+-------------------------+-----------------
+ Beautiful Morning | Today feels really good |               5
 (1 row)
 
 -- Write a query to select article which does not have more than one comment by the same user ( do this using left join and group by )
@@ -209,11 +196,11 @@ postgres-# FROM articles a
 postgres-# LEFT JOIN comments c ON a.id = c.article_id
 postgres-# GROUP BY a.id
 postgres-# HAVING COUNT(c.id) = COUNT(DISTINCT c.user_id);
- title | content
--------+---------
- B     | BBBBBB
- C     | CCCCCC
- D     | DDDDDD
- E     | EEEEEE
- F     | FFFFFF
+       title       |              content
+-------------------+-----------------------------------
+ Evening Walk      | The weather feels pleasant
+ Weekend Trip      | We had lots fun
+ Rainy Evening     | Rain makes everything peaceful
+ Morning Breakfast | Breakfast tastes really delicious
+ Happy Day         | Today was simply wonderful
 (5 rows)
