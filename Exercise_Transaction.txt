@@ -47,7 +47,7 @@ bank=# BEGIN;
 BEGIN
 bank=*# UPDATE accounts
 bank-*# SET balance = balance + 1000
-bank-*# AND account_no = 777777;
+bank-*# WHERE account_no = 777777;
 UPDATE 1
 bank=*# COMMIT;
 COMMIT
@@ -84,7 +84,7 @@ BEGIN
 bank=*# SELECT balance
 bank-*# FROM accounts a
 bank-*# WHERE account_no IN (777777, 888888)
-bank-*# FOR UPDATE OF a;
+bank-*# FOR UPDATE;
  balance
 ---------
  1500.00
@@ -94,12 +94,12 @@ bank-*# FOR UPDATE OF a;
 
 bank=*# UPDATE accounts
 bank-*# SET balance = balance - 200
-bank-*# AND account_no = 777777
+bank-*# WHERE account_no = 777777
 bank-*# AND balance >= 200;
 UPDATE 1
 bank=*# UPDATE accounts
 bank-*# SET balance = balance + 200
-bank-*# AND account_no = 888888
+bank-*# WHERE account_no = 888888
 UPDATE 1
 bank=*# COMMIT;
 COMMIT
