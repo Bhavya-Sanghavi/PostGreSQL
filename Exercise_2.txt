@@ -15,3 +15,36 @@ GRANT
 vtapp=# ALTER DEFAULT PRIVILEGES IN SCHEMA public
 vtapp-# GRANT ALL PRIVILEGES ON TABLES TO vtapp_user;
 ALTER DEFAULT PRIVILEGES
+
+vtapp=# SELECT *
+vtapp-# FROM pg_roles
+vtapp-# WHERE rolname = 'vtapp_user';
+  rolname   | rolsuper | rolinherit | rolcreaterole | rolcreatedb | rolcanlogin | rolreplication | rolconnlimit | rolpassword | rolvaliduntil | rolbypassrls | rolconfig |  oid
+------------+----------+------------+---------------+-------------+-------------+----------------+--------------+-------------+---------------+--------------+-----------+-------
+ vtapp_user | f        | t          | f             | f           | t           | f              |           -1 | ********    |               | f            |           | 16574
+(1 row)
+
+vtapp=# \l vtapp
+                                                           List of databases
+ Name  |  Owner   | Encoding | Locale Provider |      Collate       |       Ctype        | Locale | ICU Rules |    Access privileges
+-------+----------+----------+-----------------+--------------------+--------------------+--------+-----------+-------------------------
+ vtapp | postgres | UTF8     | libc            | English_India.1252 | English_India.1252 |        |           | =Tc/postgres           +
+       |          |          |                 |                    |                    |        |           | postgres=CTc/postgres  +
+       |          |          |                 |                    |                    |        |           | vtapp_user=CTc/postgres
+
+vtapp=# \dn+
+                                       List of schemas
+  Name  |       Owner       |           Access privileges            |      Description
+--------+-------------------+----------------------------------------+------------------------
+ public | pg_database_owner | pg_database_owner=UC/pg_database_owner+| standard public schema
+        |                   | =U/pg_database_owner                  +|
+        |                   | vtapp_user=UC/pg_database_owner        |
+(1 row)
+
+vtapp=# \ddp
+                Default access privileges
+  Owner   | Schema | Type  |      Access privileges
+----------+--------+-------+------------------------------
+ postgres | public | table | vtapp_user=arwdDxtm/postgres
+(1 row)
+
