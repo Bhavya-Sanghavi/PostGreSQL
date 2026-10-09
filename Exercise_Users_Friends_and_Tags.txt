@@ -106,6 +106,9 @@ friends-# (8,2),
 friends-# (8,4),
 friends-# (8,5);
 INSERT 0 22
+
+-- Find the image that has been tagged the most number of times.
+
 friends=# SELECT i.id, i.filename
 friends-# FROM tags t
 friends-# JOIN images i
@@ -118,6 +121,7 @@ friends-# LIMIT 1;
   4 | Saksham1.jpg
 (1 row)
 
+-- Find all images belonging to the friends of a particular user.
 
 friends=# SELECT i.id, i.filename
 friends-# FROM images i
@@ -136,6 +140,7 @@ friends(# );
   8 | Kanishk2.jpg
 (6 rows)
 
+-- Find all friends of a particular user (say, userA) who have tagged him(userA) in all of their pics.
 
 friends=# SELECT f.friend_id
 friends-# FROM friends f
@@ -155,6 +160,7 @@ friends(# );
          5
 (3 rows)
 
+-- Find the friend(s) of a particular user (say, userA) who has tagged him(userA) the most number of times in their images.
 
 friends=# WITH tag_counter AS(
 friends(# SELECT i.image_user, COUNT(*) as count_tag
