@@ -1,0 +1,175 @@
+postgres=# CREATE DATABASE friends;
+CREATE DATABASE
+postgres=# \c friends
+You are now connected to database "friends" as user "postgres".
+friends=# CREATE TABLE users(
+friends(# id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+friends(# name VARCHAR(40) NOT NULL
+friends(# );
+CREATE TABLE
+friends=# CREATE TABLE friends(
+friends(# user_id INT NOT NULL,
+friends(# friend_id INT NOT NULL,
+friends(# created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+friends(#
+friends(# PRIMARY KEY(user_id, friend_id),
+friends(# FOREIGN KEY(user_id) REFERENCES users(id),
+friends(# FOREIGN KEY(friend_id) REFERENCES users(id)
+friends(# );
+CREATE TABLE
+friends=# CREATE TABLE images(
+friends(# id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+friends(# image_user INT NOT NULL,
+friends(# filename VARCHAR(30),
+friends(#
+friends(# FOREIGN KEY(image_user) REFERENCES users(id)
+friends(# );
+CREATE TABLE
+friends=# CREATE TABLE tags(
+friends(# image_id INT NOT NULL,
+friends(# tagged_user INT NOT NULL,
+friends(#
+friends(# PRIMARY KEY(image_id, tagged_user),
+friends(# FOREIGN KEY(image_id) REFERENCES images(id),
+friends(# FOREIGN KEY(tagged_user) REFERENCES users(id)
+friends(# );
+CREATE TABLE
+friends=# CREATE INDEX idx_tags_tagged_user
+friends-# ON tags(tagged_user, image_id);
+CREATE INDEX
+friends=# CREATE OR REPLACE FUNCTION make_reverse_friends()
+friends-# RETURNS TRIGGER AS $$
+friends$# BEGIN
+friends$# INSERT INTO friends(user_id, friend_id, created_at)
+friends$# VALUES
+friends$# (NEW.friend_id, NEW.user_id, NEW.created_at)
+friends$# ON CONFLICT(user_id, friend_id) DO NOTHING;
+friends$# RETURN NEW;
+friends$# END;
+friends$# $$ LANGUAGE plpgsql;
+CREATE FUNCTION
+friends=# CREATE TRIGGER insert_friends_trigger
+friends-# AFTER INSERT ON friends
+friends-# FOR EACH ROW
+friends-# EXECUTE FUNCTION make_reverse_friends();
+CREATE TRIGGER
+friends=# INSERT INTO users(name)
+friends-# VALUES
+friends-# ('Bhavya'),
+friends-# ('Vineet'),
+friends-# ('Kaif'),
+friends-# ('Saksham'),
+friends-# ('Hemant'),
+friends-# ('Kanishk');
+INSERT 0 6
+friends=# INSERT INTO friends(user_id, friend_id)
+friends-# VALUES
+friends-# (1,2),
+friends-# (4,1),
+friends-# (1,5),
+friends-# (6,1),
+friends-# (2,3);
+INSERT 0 5
+friends=# INSERT INTO images(image_user, filename)
+friends-# VALUES
+friends-# (2,'Vineet1.jpg'),
+friends-# (3,'Kaif1.jpg'),
+friends-# (3,'Kaif2.jpg'),
+friends-# (4,'Saksham1.jpg'),
+friends-# (5,'Hemant1.jpg'),
+friends-# (5,'Hemant2.jpg'),
+friends-# (6,'Kansihk1.jpg'),
+friends-# (6,'Kanishk2.jpg');
+INSERT 0 8
+friends=# INSERT INTO tags(image_id, tagged_user)
+friends-# VALUES
+friends-# (1,1),
+friends-# (1,3),
+friends-# (1,4),
+friends-# (2,1),
+friends-# (2,2),
+friends-# (2,4),
+friends-# (3,2),
+friends-# (3,3),
+friends-# (4,1),
+friends-# (4,2),
+friends-# (4,3),
+friends-# (4,5),
+friends-# (5,1),
+friends-# (5,2),
+friends-# (6,1),
+friends-# (6,3),
+friends-# (7,1),
+friends-# (7,2),
+friends-# (7,3),
+friends-# (8,2),
+friends-# (8,4),
+friends-# (8,5);
+INSERT 0 22
+friends=# SELECT i.id, i.filename
+friends-# FROM tags t
+friends-# JOIN images i
+friends-# ON t.image_id = i.id
+friends-# GROUP BY i.id
+friends-# ORDER BY COUNT(*) DESC
+friends-# LIMIT 1;
+ id |   filename
+----+--------------
+  4 | Saksham1.jpg
+(1 row)
+
+
+friends=# SELECT i.id, i.filename
+friends-# FROM images i
+friends-# WHERE i.image_user IN(
+friends(# SELECT f.friend_id
+friends(# FROM friends f
+friends(# WHERE user_id = 1
+friends(# );
+ id |   filename
+----+--------------
+  1 | Vineet1.jpg
+  4 | Saksham1.jpg
+  5 | Hemant1.jpg
+  6 | Hemant2.jpg
+  7 | Kansihk1.jpg
+  8 | Kanishk2.jpg
+(6 rows)
+
+
+friends=# SELECT f.friend_id
+friends-# FROM friends f
+friends-# WHERE f.user_id = 1
+friends-# AND f.friend_id IN(
+friends(# SELECT i.image_user
+friends(# FROM images i
+friends(# LEFT JOIN tags t
+friends(# ON i.id = t.image_id
+friends(# GROUP BY i.image_user
+friends(# HAVING COUNT(DISTINCT i.id) = COUNT(DISTINCT t.image_id) FILTER(WHERE t.tagged_user = 1)
+friends(# );
+ friend_id
+-----------
+         2
+         4
+         5
+(3 rows)
+
+
+friends=# WITH tag_counter AS(
+friends(# SELECT i.image_user, COUNT(*) as count_tag
+friends(# FROM images i
+friends(# JOIN tags t
+friends(# ON i.id = t.image_id
+friends(# WHERE t.tagged_user = 1
+friends(# GROUP BY i.image_user
+friends(# )
+friends-# SELECT f.friend_id, count_tag
+friends-# FROM friends f
+friends-# JOIN tag_counter
+friends-# ON image_user = f.friend_id
+friends-# WHERE f.user_id = 1 AND count_tag = (SELECT MAX(count_tag) FROM tag_counter);
+ friend_id | count_tag
+-----------+-----------
+         5 |         2
+(1 row)
