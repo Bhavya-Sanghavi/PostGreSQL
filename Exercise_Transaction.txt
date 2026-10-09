@@ -1,3 +1,18 @@
+consider the following schema:
+create database bank
+
+tables:
+users(id, name, email, account_no)
+accounts(id, account_no, balance)
+
+Queries:
+Insert some raw data and do the following queries using mysql transaction statement:
+i) userA is depositing 1000 Rs. his account
+
+ii) userA is withdrawing 500 Rs.
+
+iii) userA is transferring 200 Rs to userB's account
+
 postgres=# CREATE DATABASE bank;
 CREATE DATABASE
 postgres=# \c bank
@@ -5,7 +20,7 @@ You are now connected to database "bank" as user "postgres".
 bank=# CREATE TABLE accounts(
 bank(# id SERIAL PRIMARY KEY,
 bank(# account_no BIGINT NOT NULL UNIQUE,
-bank(# balance NUMERIC(16,2) NOT NULL DEFAULT 0.00 CHECK(balance >= 0)
+bank(# balance NUMERIC(12,2) NOT NULL DEFAULT 0.00
 bank(# );
 CREATE TABLE
 bank=# CREATE TABLE users(
@@ -25,13 +40,14 @@ bank=# INSERT INTO users(name,email,account_no) VALUES
 bank-# ('userA','A@gmail.com',777777),
 bank-# ('userB','B@gmail.com',888888);
 INSERT 0 2
+
+-- i) userA is depositing 1000 Rs. his account
+
 bank=# BEGIN;
 BEGIN
-bank=*# UPDATE accounts a
+bank=*# UPDATE accounts
 bank-*# SET balance = balance + 1000
-bank-*# FROM users u
-bank-*# WHERE a.account_no = u.account_no
-bank-*# AND u.name = 'userA';
+bank-*# WHERE account_no = 777777;
 UPDATE 1
 bank=*# COMMIT;
 COMMIT
@@ -42,26 +58,13 @@ bank=# SELECT * FROM accounts;
   1 |     777777 | 2000.00
 (2 rows)
 
+-- ii) userA is withdrawing 500 Rs.
 
 bank=# BEGIN;
 BEGIN
-bank=*# SELECT a.balance
-bank-*# FROM accounts a
-bank-*# JOIN users u
-bank-*# ON a.account_no = u.account_no
-bank-*# WHERE u.name = 'userA'
-bank-*# FOR UPDATE OF a;
- balance
----------
- 2000.00
-(1 row)
-
-
-bank=*# UPDATE accounts a
+bank=*# UPDATE accounts
 bank-*# SET balance = balance - 500
-bank-*# FROM users u
-bank-*# WHERE a.account_no = u.account_no
-bank-*# AND u.name = 'userA'
+bank-*# WHERE account_no = 777777
 bank-*# AND balance >= 500;
 UPDATE 1
 bank=*# COMMIT;
@@ -73,14 +76,15 @@ bank=# SELECT * FROM accounts;
   1 |     777777 | 1500.00
 (2 rows)
 
+-- iii) userA is transferring 200 Rs to userB's account
+
 
 bank=# BEGIN;
 BEGIN
-bank=*# SELECT a.balance
+bank=*# SELECT balance
 bank-*# FROM accounts a
-bank-*# JOIN users u ON a.account_no = u.account_no
-bank-*# WHERE u.name IN ('userA','userB')
-bank-*# FOR UPDATE OF a;
+bank-*# WHERE account_no IN (777777, 888888)
+bank-*# FOR UPDATE;
  balance
 ---------
  1500.00
@@ -88,18 +92,14 @@ bank-*# FOR UPDATE OF a;
 (2 rows)
 
 
-bank=*# UPDATE accounts a
+bank=*# UPDATE accounts
 bank-*# SET balance = balance - 200
-bank-*# FROM users u
-bank-*# WHERE a.account_no = u.account_no
-bank-*# AND u.name = 'userA'
-bank-*# AND a.balance >= 200;
+bank-*# WHERE account_no = 777777
+bank-*# AND balance >= 200;
 UPDATE 1
-bank=*# UPDATE accounts a
+bank=*# UPDATE accounts
 bank-*# SET balance = balance + 200
-bank-*# FROM users u
-bank-*# WHERE a.account_no = u.account_no
-bank-*# AND u.name = 'userB';
+bank-*# WHERE account_no = 888888
 UPDATE 1
 bank=*# COMMIT;
 COMMIT

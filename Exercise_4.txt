@@ -1,3 +1,8 @@
+-- Take back up of the db you created for practice/exercise and send it to me.
+
+Now create a new database named "restored" and restore that backup into this DB.
+
+
 C:\Program Files\PostgreSQL\18\bin>pg_dump -U postgres -d mydb -F c -f "C:\Users\bhavy\OneDrive\Desktop\backup\mydb.dump"
 
 postgres=# CREATE DATABASE restored;
