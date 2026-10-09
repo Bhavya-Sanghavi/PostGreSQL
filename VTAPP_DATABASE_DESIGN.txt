@@ -1,0 +1,84 @@
+
+CREATE TYPE user_role AS ENUM('Admin', 'Mentor', 'Trainee');
+CREATE TYPE track_status AS ENUM('Started', 'Finished', 'Cancelled');
+CREATE TYPE task_type AS ENUM('Study', 'Exercise');
+CREATE TYPE task_status AS ENUM('Not started', 'Started', 'Finished');
+CREATE TYPE review_action AS ENUM('Rejected', 'Accepted');
+
+CREATE TABLE users(
+id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+name VARCHAR(40) NOT NULL,
+email VARCHAR(100) NOT NULL UNIQUE,
+role user_role NOT NULL DEFAULT 'Trainee',
+is_active BOOLEAN NOT NULL DEFAULT TRUE,
+created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE tracks(
+id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+name VARCHAR(40) NOT NULL UNIQUE,
+description TEXT NOT NULL
+);
+
+CREATE TABLE track_assignments(
+id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+track_id INT NOT NULL REFERENCES tracks(id),
+trainee_id INT NOT NULL REFERENCES users(id),
+status track_status NOT NULL DEFAULT 'Started',
+assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+completed_at TIMESTAMPTZ,
+CONSTRAINT check_track_completion CHECK(
+(status = 'Finished' AND completed_at IS NOT NULL)
+OR
+(status <> 'Finished' AND completed_at IS NULL)
+)
+);
+
+CREATE TABLE tasks(
+id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+name VARCHAR(40) NOT NULL UNIQUE,
+description TEXT NOT NULL,
+type task_type NOT NULL,
+track_id INT NOT NULL REFERENCES tracks(id)
+);
+
+CREATE TABLE task_assignments(
+id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+task_id INT NOT NULL REFERENCES tasks(id),
+trainee_id INT NOT NULL REFERENCES users(id),
+status task_status NOT NULL,
+started_at TIMESTAMPTZ,
+completed_at TIMESTAMPTZ,
+last_activity_at TIMESTAMPTZ
+CONSTRAINT check_task_completion CHECK(
+(status = 'Finished' AND completed_at IS NOT NULL)
+OR
+(status <> 'Finished' AND completed_at IS NULL)
+)
+);
+
+CREATE TABLE task_submissions(
+id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+task_id INT NOT NULL REFERENCES tasks(id),
+submitted_by INT NOT NULL REFERENCES users(id),
+submission_url TEXT NOT NULL CHECK(submission_url ~* '^https://'),
+submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+submitted_to INT NOT NULL REFERENCES users(id)
+);
+
+CREATE TABLE review_submissions(
+id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+task_submission_id INT NOT NULL REFERENCES task_submissions(id),
+reviewed_by INT NOT NULL REFERENCES users(id),
+reviewed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+action review_action NOT NULL,
+comment TEXT 
+);
+
+CREATE TABLE comments(
+id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+comment TEXT NOT NULL,
+comment_by INT NOT NULL REFERENCES users(id),
+task_assignment_id INT NOT NULL REFERENCES task_assignments(id)
+);
