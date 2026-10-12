@@ -1,0 +1,69 @@
+postgres=# CREATE DATABASE email_campaign;
+CREATE DATABASE
+postgres=# \c email_campaign
+You are now connected to database "email_campaign" as user "postgres".
+email_campaign=# CREATE TABLE email_subs(
+email_campaign(# id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+email_campaign(# email VARCHAR(100),
+email_campaign(# phone_no VARCHAR(10),
+email_campaign(# city VARCHAR(50)
+email_campaign(# );
+CREATE TABLE
+email_campaign=# \copy email_subs(email, phone_no, city) FROM 'C:\Users\bhavy\Downloads\email_subscribers.txt' WITH (FORMAT CSV, HEADER FALSE)
+COPY 200
+email_campaign=# SELECT DISTINCT city
+email_campaign-# FROM email_subs;
+   city
+-----------
+  Chennai
+  Lucknow
+  Delhi
+  Kolkatta
+  Mumbai
+(5 rows)
+
+
+email_campaign=# SELECT city, COUNT(*) as number_of_respondents
+email_campaign-# FROM email_subs
+email_campaign-# GROUP BY city;
+   city    | number_of_respondents
+-----------+-----------------------
+  Chennai  |                    42
+  Lucknow  |                    39
+  Delhi    |                    40
+  Kolkatta |                    38
+  Mumbai   |                    41
+(5 rows)
+
+
+email_campaign=# SELECT city, COUNT(*) as number_of_respondents
+email_campaign-# FROM email_subs
+email_campaign-# GROUP BY city
+email_campaign-# ORDER BY number_of_respondents
+email_campaign-# LIMIT 1;
+   city    | number_of_respondents
+-----------+-----------------------
+  Kolkatta |                    38
+(1 row)
+
+
+email_campaign=# SELECT DISTINCT regexp_matches(email, '@(\w*\.\w*)') as domains
+email_campaign-# FROM email_subs;
+    domains
+---------------
+ {yahoo.com}
+ {hotmail.com}
+ {me.com}
+ {gmail.com}
+(4 rows)
+
+
+email_campaign=# SELECT regexp_matches(email, '@(\w*\.\w*)') as domains
+email_campaign-# FROM email_subs
+email_campaign-# GROUP BY domains
+email_campaign-# ORDER BY COUNT(*)
+email_campaign-# LIMIT 1;
+    domains
+---------------
+ {hotmail.com}
+(1 row)
