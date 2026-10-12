@@ -11,6 +11,9 @@ email_campaign(# );
 CREATE TABLE
 email_campaign=# \copy email_subs(email, phone_no, city) FROM 'C:\Users\bhavy\Downloads\email_subscribers.txt' WITH (FORMAT CSV, HEADER FALSE)
 COPY 200
+
+-- What all cities did people respond from
+
 email_campaign=# SELECT DISTINCT city
 email_campaign-# FROM email_subs;
    city
@@ -22,6 +25,7 @@ email_campaign-# FROM email_subs;
   Mumbai
 (5 rows)
 
+-- How many people responded from each city
 
 email_campaign=# SELECT city, COUNT(*) as number_of_respondents
 email_campaign-# FROM email_subs
@@ -35,28 +39,31 @@ email_campaign-# GROUP BY city;
   Mumbai   |                    41
 (5 rows)
 
+-- Which city were the maximum respondents from?
 
 email_campaign=# SELECT city, COUNT(*) as number_of_respondents
 email_campaign-# FROM email_subs
 email_campaign-# GROUP BY city
-email_campaign-# ORDER BY number_of_respondents
+email_campaign-# ORDER BY number_of_respondents DESC
 email_campaign-# LIMIT 1;
-   city    | number_of_respondents
------------+-----------------------
-  Kolkatta |                    38
+   city   | number_of_respondents
+----------+-----------------------
+  Chennai |                   168
 (1 row)
 
+-- What all email domains did people respond from ?
 
-email_campaign=# SELECT DISTINCT regexp_matches(email, '@(\w*\.\w*)') as domains
+email_campaign=# SELECT DISTINCT SPLIT_PART(email, '@', 2)
 email_campaign-# FROM email_subs;
-    domains
----------------
- {yahoo.com}
- {hotmail.com}
- {me.com}
- {gmail.com}
+  split_part
+--------------
+ yahoo.com
+ me.com
+ gmail.com
+ hotmail.com
 (4 rows)
 
+-- Which is the most popular email domain among the respondents ?
 
 email_campaign=# SELECT regexp_matches(email, '@(\w*\.\w*)') as domains
 email_campaign-# FROM email_subs
