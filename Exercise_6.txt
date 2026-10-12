@@ -48,7 +48,7 @@ email_campaign-# ORDER BY number_of_respondents DESC
 email_campaign-# LIMIT 1;
    city   | number_of_respondents
 ----------+-----------------------
-  Chennai |                   42
+  Chennai |                    42
 (1 row)
 
 -- What all email domains did people respond from ?
