@@ -62,6 +62,16 @@ bank=# SELECT * FROM accounts;
 
 bank=# BEGIN;
 BEGIN
+bank=*# SELECT balance
+bank-*# FROM accounts a
+bank-*# WHERE account_no = 777777
+bank-*# FOR UPDATE;
+ balance
+---------
+ 2000.00
+(1 row)
+
+
 bank=*# UPDATE accounts
 bank-*# SET balance = balance - 500
 bank-*# WHERE account_no = 777777
