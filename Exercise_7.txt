@@ -22,6 +22,7 @@ No, we should add an index on user_id
 Q3.1
 
 We can write in any order for this query because all are equality conditions but for other common queries it would be efficient to make composite index on (commentable_type, commentable_id, user_id), in this order.
+Creating a composite index will be better because we can get matching row from the composite indexx directly but if we create seperate indexes the planner would have to use BItmap Index Scan to combine the three indexes itself and then use it to get the matching rows
 
 Q4.1 
 

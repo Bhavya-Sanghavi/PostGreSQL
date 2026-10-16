@@ -204,3 +204,40 @@ postgres-# HAVING COUNT(c.id) = COUNT(DISTINCT c.user_id);
  Morning Breakfast | Breakfast tastes really delicious
  Happy Day         | Today was simply wonderful
 (5 rows)
+
+--- manage(create, update, delete) categories, articles, comments, and users
+
+postgres=# UPDATE users
+postgres-# SET user_type = 'admin'
+postgres-# WHERE id = 2;
+UPDATE 1
+postgres=# SELECT * FROM users;
+ id | name  |      email      | user_type
+----+-------+-----------------+-----------
+  3 | user3 | user3@gmail.com | normal
+  4 | user4 | user4@gmail.com | normal
+  5 | user5 | user5@gmail.com | normal
+  1 | user1 | user1@gmail.com | admin
+  2 | user2 | user2@gmail.com | admin
+(5 rows)
+
+
+postgres=# ALTER TABLE comments 
+postgres-# DROP CONSTRAINT comments_user_id_fkey;
+ALTER TABLE
+postgres=# ALTER TABLE comments
+postgres-# ADD CONSTRAINT comments_user_id_fkey
+postgres-# FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+ALTER TABLE
+postgres=# DELETE FROM users
+postgres-# WHERE id = 4;
+DELETE 1
+postgres=# SELECT *
+postgres-# FROM users;
+ id | name  |      email      | user_type
+----+-------+-----------------+-----------
+  3 | user3 | user3@gmail.com | normal
+  5 | user5 | user5@gmail.com | normal
+  1 | user1 | user1@gmail.com | admin
+  2 | user2 | user2@gmail.com | admin
+(4 rows)
