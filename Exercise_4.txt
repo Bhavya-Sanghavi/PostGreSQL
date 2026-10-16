@@ -22,3 +22,11 @@ restored=# \dt
  public | users      | table | postgres
 (4 rows)
 
+
+Flags Used :
+
+-U for user
+-d for database
+-F for format
+c for custom
+-f for output file
