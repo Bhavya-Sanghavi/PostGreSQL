@@ -45,7 +45,7 @@ email_campaign=# SELECT city, COUNT(*) as number_of_respondents
 email_campaign-# FROM email_subs
 email_campaign-# GROUP BY city
 email_campaign-# ORDER BY number_of_respondents DESC
-email_campaign-# LIMIT 1;
+email_campaign-# FETCH FIRST 1 ROW WITH TIES;
    city   | number_of_respondents
 ----------+-----------------------
   Chennai |                    42
@@ -65,12 +65,13 @@ email_campaign-# FROM email_subs;
 
 -- Which is the most popular email domain among the respondents ?
 
-email_campaign=# SELECT regexp_matches(email, '@(\w*\.\w*)') as domains
+email_campaign=# SELECT SPLIT_PART(email, '@', 2) AS domain, COUNT(*) AS count
 email_campaign-# FROM email_subs
-email_campaign-# GROUP BY domains
-email_campaign-# ORDER BY COUNT(*)
-email_campaign-# LIMIT 1;
-    domains
----------------
- {hotmail.com}
-(1 row)
+email_campaign-# GROUP BY SPLIT_PART(email, '@', 2)
+email_campaign-# ORDER BY count DESC
+email_campaign-# FETCH FIRST 1 ROW WITH TIES;
+   domain   | count
+------------+-------
+ yahoo.com  |    51
+ me.com     |    51
+(2 rows)
